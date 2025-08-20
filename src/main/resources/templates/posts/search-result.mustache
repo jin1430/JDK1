@@ -1,0 +1,19 @@
+{{> layout/header}}
+
+<div class="container mt-5">
+    <h2>검색 결과: "{{keyword}}"</h2>
+
+    {{#postList}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{title}}</h5>
+                <p class="card-text">{{content}}</p>
+                <a href="/view/posts/{{id}}" class="btn btn-outline-primary btn-sm">자세히 보기</a>
+            </div>
+        </div>
+    {{/postList}}
+
+    {{^postList}}
+        <p>검색 결과가 없습니다.</p>
+    {{/postList}}
+</div>

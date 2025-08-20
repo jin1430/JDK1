@@ -1,0 +1,85 @@
+{{> layout/head}}
+<title>관리자 - 변호사 승인</title>
+{{> layout/header}}
+
+<div class="container my-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h3 class="mb-0">변호사 승인 관리</h3>
+        <form class="d-flex" method="get" action="/admin/lawyers">
+            <select class="form-select me-2" name="status" style="width: 200px;">
+                <option value="ALL"      {{#statusIsAll}}selected{{/statusIsAll}}>전체(ALL)</option>
+                <option value="PENDING"  {{#statusIsPending}}selected{{/statusIsPending}}>대기(PENDING)</option>
+                <option value="APPROVED" {{#statusIsApproved}}selected{{/statusIsApproved}}>승인(APPROVED)</option>
+                <option value="REJECTED" {{#statusIsRejected}}selected{{/statusIsRejected}}>반려(REJECTED)</option>
+            </select>
+            <button class="btn btn-primary">필터</button>
+        </form>
+    </div>
+
+    {{#msg}}<div class="alert alert-success">{{.}}</div>{{/msg}}
+
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>이메일</th>
+                <th>이름</th>
+                <th>자격번호</th>
+                <th style="width: 220px;">상태 변경</th>
+                <th class="text-end">액션</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#rows}}
+                <tr>
+                    <td>{{id}}</td>
+                    <td>{{email}}</td>
+                    <td>{{username}}</td>
+                    <td>{{certificateNumber}}</td>
+                    <td>
+                        <form class="lawyer-status-form d-flex align-items-center gap-2" method="post" action="/admin/lawyers/{{id}}/status">
+                            {{#_csrf}}<input type="hidden" name="{{parameterName}}" value="{{token}}">{{/_csrf}}
+                            <input type="hidden" name="filter" value="{{status}}">
+                            <input type="hidden" name="page"   value="{{currentPage}}">
+
+                            <select name="status" class="form-select form-select-sm" style="width: 160px;">
+                                <option value="PENDING"  {{#isPending}}selected{{/isPending}}>PENDING</option>
+                                <option value="APPROVED" {{#isApproved}}selected{{/isApproved}}>APPROVED</option>
+                                <option value="REJECTED" {{#isRejected}}selected{{/isRejected}}>REJECTED</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-primary d-none d-md-inline-flex">저장</button>
+                        </form>
+                    </td>
+                    <td class="text-end"><!-- 필요 시 추가 버튼 --></td>
+                </tr>
+            {{/rows}}
+
+            {{^rows}}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">데이터가 없습니다.</td>
+                </tr>
+            {{/rows}}
+            </tbody>
+        </table>
+    </div>
+
+    <nav>
+        <ul class="pagination justify-content-center">
+            {{#page.hasPrevious}}
+                <li class="page-item">
+                    <a class="page-link" href="/admin/lawyers?status={{status}}&page={{prevPage}}">이전</a>
+                </li>
+            {{/page.hasPrevious}}
+
+            <li class="page-item disabled"><span class="page-link">{{displayPage}} / {{totalPages}}</span></li>
+
+            {{#page.hasNext}}
+                <li class="page-item">
+                    <a class="page-link" href="/admin/lawyers?status={{status}}&page={{nextPage}}">다음</a>
+                </li>
+            {{/page.hasNext}}
+        </ul>
+    </nav>
+</div>
+{{> layout/footer}}

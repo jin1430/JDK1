@@ -1,0 +1,40 @@
+{{> layout/header}}
+
+<div class="container mt-4" style="max-width:720px;">
+    <h2 class="fw-bold mb-3">회원 수정</h2>
+
+    <form method="post" action="/admin/members/{{user.id}}/edit" class="card p-4 shadow-sm">
+        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+
+        <div class="mb-3">
+            <label class="form-label">이메일</label>
+            <input class="form-control" type="text" value="{{user.email}}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">이름</label>
+            <input class="form-control" name="username" value="{{user.username}}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">주소</label>
+            <input class="form-control" name="address" value="{{user.address}}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">역할</label>
+            <select name="role" class="form-select">
+                <option value="MEMBER" {{#roleIsMember}}selected{{/roleIsMember}}>일반회원</option>
+                <option value="LAWYER" {{#roleIsLawyer}}selected{{/roleIsLawyer}}>변호사</option>
+                <option value="ADMIN"  {{#roleIsAdmin}}selected{{/roleIsAdmin}}>관리자</option>
+            </select>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">저장</button>
+            <a href="/admin/members/{{id}}/edit" class="btn btn-secondary">취소</a>
+        </div>
+    </form>
+</div>
+
+{{> layout/footer}}

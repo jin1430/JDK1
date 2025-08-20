@@ -1,0 +1,50 @@
+{{> layout/header}}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3">게시글 관리</h2>
+
+    <form action="/admin/posts" method="get" class="d-flex justify-content-end mb-3 gap-2">
+        <input type="text" name="keyword"
+               class="form-control w-25"
+               placeholder="제목/내용/댓글 검색"
+               value="{{#keyword}}{{.}}{{/keyword}}">
+        <button class="btn btn-outline-dark">검색</button>
+    </form>
+
+    <div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>카테고리</th>
+            <th>생성일</th>
+            <th>조회수</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#postList}}
+            <tr>
+                <td><a href="/view/posts/{{id}}" class="text-decoration-none">{{title}}</a></td>
+                <td>{{user.email}}</td>
+                <td>{{category.name}}</td>
+                <td>{{generationDate}}</td>
+                <td>{{views}}</td>
+                <td class="text-nowrap">
+                    <form action="/admin/posts/{{id}}/delete" method="post" style="display:inline;">
+                        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+                        <button class="btn btn-sm btn-danger" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+                    </form>
+                </td>
+            </tr>
+        {{/postList}}
+        {{^postList}}
+            <tr><td colspan="6" class="text-center text-muted">게시글이 없습니다.</td></tr>
+        {{/postList}}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+{{> layout/footer}}

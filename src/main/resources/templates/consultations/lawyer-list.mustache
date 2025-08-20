@@ -1,0 +1,45 @@
+{{> layout/header}}
+<main class="container py-4">
+    <h3 class="mb-3">받은 상담 요청</h3>
+
+    {{#consultations}}
+        <div class="card mb-3" id="c{{id}}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="fw-bold">{{title}}</div>
+                        <small class="text-muted">요청자: {{requester.username}} / {{requestDate}}</small>
+                    </div>
+                    <span class="badge {{#isCompleted}}bg-success{{/isCompleted}}{{^isCompleted}}bg-secondary{{/isCompleted}}">
+          {{#isCompleted}}완료{{/isCompleted}}{{^isCompleted}}대기{{/isCompleted}}
+        </span>
+                </div>
+
+                <p class="mt-2 mb-2">{{content}}</p>
+
+                {{#lawyerReply}}
+                    <div class="p-3 bg-light rounded">
+                        <div class="fw-semibold">내 답변</div>
+                        <div class="mt-1">{{lawyerReply}}</div>
+                        <small class="text-muted">답변일: {{replyDate}}</small>
+                    </div>
+                {{/lawyerReply}}
+
+                {{^lawyerReply}}
+                    <form class="mt-2" method="post" action="/view/mypage/lawyer/consultations/{{id}}/reply">
+                        {{#_csrf}}<input type="hidden" name="{{parameterName}}" value="{{token}}">{{/_csrf}}
+                        <div class="mb-2">
+                            <textarea name="reply" class="form-control" rows="3" placeholder="여기에 답변을 작성하세요" required></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-sm">답변 보내기</button>
+                    </form>
+                {{/lawyerReply}}
+            </div>
+        </div>
+    {{/consultations}}
+
+    {{^consultations}}
+        <p class="text-muted">받은 상담 요청이 없습니다.</p>
+    {{/consultations}}
+</main>
+{{> layout/footer}}

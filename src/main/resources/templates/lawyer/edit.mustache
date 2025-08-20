@@ -1,0 +1,64 @@
+{{> layout/header}}
+
+<div class="container my-5" style="max-width: 700px;">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">⚖️ 변호사 프로필 수정</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" action="/view/lawyers/{{lawyer.id}}/edit" enctype="multipart/form-data">
+                {{#_csrf}}
+                    <input type="hidden" name="{{parameterName}}" value="{{token}}">
+                {{/_csrf}}
+
+                <div class="mb-3">
+                    <label class="form-label">이름</label>
+                    <input type="text" name="name" class="form-control"
+                           value="{{lawyer.user.username}}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">한 줄 소개</label>
+                    <input type="text" name="title" class="form-control"
+                           value="{{lawyer.title}}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">자기소개</label>
+                    <textarea name="bio" class="form-control" rows="4">{{lawyer.bio}}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">소속 / 사무소</label>
+                    <input type="text" name="office" class="form-control"
+                           value="{{lawyer.office}}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">경력</label>
+                    <input type="text" name="career" class="form-control"
+                           value="{{lawyer.career}}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">전문 분야</label>
+                    <input type="text" name="specialty" class="form-control"
+                           value="{{lawyer.specialty}}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">프로필 사진</label><br>
+                    {{#lawyer.profileImageUrl}}
+                        <img src="{{lawyer.profileImageUrl}}"
+                             alt="프로필 이미지" class="img-thumbnail mb-2" width="150">
+                    {{/lawyer.profileImageUrl}}
+                    <input type="file" name="profileImage" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">저장</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{> layout/footer}}

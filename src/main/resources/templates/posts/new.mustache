@@ -1,0 +1,73 @@
+{{> layout/header}}
+
+<section class="container" style="max-width:980px;">
+
+    <div class="mb-2 mt-5">
+        <h1 class="fw-bold">무엇이든 물어보세요</h1>
+        <div class="text-muted" style="margin-top:-4px;">답변은 언제나 무료예요</div>
+    </div>
+
+    <!-- ✅ 기존 변수/필드명 변경 없이 유지: title, content, crimeCategory, categories, _csrf -->
+    <form method="post" action="/view/posts/new" class="card shadow-sm border-0" enctype="multipart/form-data">
+        <div class="card-body p-4">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">제목</label>
+                <input type="text" name="title" class="form-control" placeholder="제목을 작성해 주세요" required>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label fw-semibold">내용</label>
+                <div class="d-flex align-items-center gap-3 text-muted mb-2">
+                    <i class="bi bi-image"></i><i class="bi bi-list-ul"></i><i class="bi bi-link-45deg"></i>
+                </div>
+                <textarea name="content" class="form-control" rows="10" placeholder="질문의 내용을 구체적으로 적어주세요." required></textarea>
+            </div>
+
+            <!-- 📷 대표 이미지 (선택) -->
+            <div class="mb-3 mt-3">
+                <label class="form-label fw-semibold">대표 이미지 (선택)</label>
+                <input class="form-control" type="file" name="image" id="postImageInput" accept="image/*">
+                <div id="postImagePreviewWrap" class="mt-2 d-none">
+                    <img id="postImagePreview" class="img-fluid rounded shadow-sm" alt="미리보기">
+                </div>
+                <div class="form-text">이미지는 선택 사항입니다. 10MB 이하 JPG/PNG 권장</div>
+            </div>
+
+            <div class="mb-3 mt-3">
+                <label class="form-label fw-semibold">토픽</label>
+                <div class="input-group">
+                    <select name="crimeCategory" class="form-select" required>
+                        <option value="" disabled selected>관련 토픽 선택</option>
+                        {{#categories}}
+                            <option value="{{value}}">{{label}}</option>
+                        {{/categories}}
+                    </select>
+                    <span class="input-group-text"><i class="bi bi-caret-down-fill"></i></span>
+                </div>
+            </div>
+
+            {{#_csrf}}<input type="hidden" name="{{parameterName}}" value="{{token}}">{{/_csrf}}
+        </div>
+
+        <div class="card-footer bg-white border-0 p-4">
+            <button class="btn btn-primary w-100 py-3 fw-bold">질문하기</button>
+        </div>
+    </form>
+</section>
+
+{{> layout/footer}}
+
+<script>
+    // 이미지 미리보기
+    const postInput = document.getElementById('postImageInput');
+    if (postInput) {
+      postInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        const wrap = document.getElementById('postImagePreviewWrap');
+        const img = document.getElementById('postImagePreview');
+        if (!file) { wrap && wrap.classList.add('d-none'); return; }
+        if (img && wrap) { img.src = URL.createObjectURL(file); wrap.classList.remove('d-none'); }
+      });
+    }
+</script>
+

@@ -1,0 +1,64 @@
+{{> layout/header}}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3">회원 관리</h2>
+
+    <form action="/admin/members" method="get" class="d-flex justify-content-end mb-3 gap-2">
+        <input type="text" name="keyword" class="form-control w-25" placeholder="이메일 검색">
+        <button class="btn btn-outline-dark">검색</button>
+    </form>
+
+    <div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>이메일</th>
+            <th>이름</th>
+            <th>역할</th>
+            <th>가입일</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#members}}
+            <tr>
+                <td>{{email}}</td>
+                <td>{{username}}</td>
+                <td>{{role}}</td>
+                <td>{{createdAt}}</td>
+                <td class="text-nowrap">
+                    <a href="/admin/members/{{id}}/edit" class="btn btn-sm btn-primary">수정</a>
+                    <form action="/admin/members/{{id}}/delete" method="post" style="display:inline;">
+                        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+                    </form>
+                </td>
+            </tr>
+        {{/members}}
+
+        {{#userList}}  {{! AdminController 호환 }}
+            <tr>
+                <td>{{email}}</td>
+                <td>{{username}}</td>
+                <td>{{role}}</td>
+                <td>{{createdAt}}</td>
+                <td class="text-nowrap">
+                    <a href="/admin/members/{{id}}/edit" class="btn btn-sm btn-primary">수정</a>
+                    <form action="/admin/members/delete" method="post" style="display:inline;">
+                        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+                        <input type="hidden" name="id" value="{{id}}">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+                    </form>
+                </td>
+            </tr>
+        {{/userList}}
+
+        {{^members}}{{^userList}}
+            <tr><td colspan="5" class="text-center text-muted">회원이 없습니다.</td></tr>
+        {{/userList}}{{/members}}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+{{> layout/footer}}

@@ -1,0 +1,150 @@
+{{> layout/header}}
+
+<section class="lgc-hero">
+    <div class="container text-center">
+        <h1 class="fw-bold mb-2">변호사를 지금 바로 만나보세요.</h1>
+        <p class="lead text-muted mb-4">신뢰할 수 있는 법률 자문을 쉽게 빠르게 받아보세요.</p>
+        <a href="/view/lawyers" class="btn btn-primary btn-lg px-4">변호사 찾기</a>
+    </div>
+</section>
+
+<div class="container my-5">
+
+    <!-- 최신 -->
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="lgc-sec-title mb-0">최신 &gt;</h5>
+            <a href="/view/posts" class="text-decoration-none small text-muted">전체보기</a>
+        </div>
+
+        {{#latestPosts}}
+            <article class="lgc-post-card">
+                <div class="lgc-post-head small text-muted mb-1">
+                    {{#categoryPath}}<span class="me-2">{{categoryPath}}</span>{{/categoryPath}}
+                    <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">답변</span>
+                    <span class="ms-2 text-muted">변호사 답변</span>
+                </div>
+                <h6 class="mb-1"><a class="text-decoration-none text-dark" href="/view/posts/{{id}}">{{title}}</a></h6>
+                <p class="lgc-ellipsis-2 text-muted mb-2">{{content}}</p>
+                <div class="lgc-post-meta small text-muted">조회수 {{views}}{{#ago}} · {{ago}}{{/ago}}</div>
+            </article>
+        {{/latestPosts}}
+        {{^latestPosts}}
+            <div class="text-muted">게시물이 없습니다.</div>
+        {{/latestPosts}}
+    </section>
+
+    <!-- 분야별 게시글 -->
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="lgc-sec-title mb-0">분야별 게시글 &gt;</h5>
+            <a href="/view/posts" class="text-decoration-none small text-muted">전체보기</a>
+        </div>
+
+        <ul class="nav nav-pills gap-2 flex-wrap mb-3" id="postTab">
+            {{#postCategories}}
+                <li class="nav-item">
+                    <a class="nav-link {{#active}}active{{/active}}" data-category="{{key}}" href="javascript:void(0)">{{label}}</a>
+                </li>
+            {{/postCategories}}
+        </ul>
+
+        <div class="row g-3" id="postGrid">
+            {{#postCards}}
+                <div class="col-md-6" data-category="{{categoryKey}}">
+                    <article class="lgc-post-card h-100">
+                        <div class="lgc-post-head small text-muted mb-1">
+                            {{#categoryPath}}<span class="me-2">{{categoryPath}}</span>{{/categoryPath}}
+                            <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">답변</span>
+                            <span class="ms-2 text-muted">변호사 답변</span>
+                        </div>
+                        <h6 class="mb-1">
+                            <a class="text-decoration-none text-dark" href="/view/posts/{{id}}">{{title}}</a>
+                        </h6>
+                        <p class="lgc-ellipsis-2 text-muted mb-2">{{content}}</p>
+                        <div class="lgc-post-meta small text-muted">조회수 {{views}}{{#ago}} · {{ago}}{{/ago}}</div>
+                    </article>
+                </div>
+            {{/postCards}}
+            {{^postCards}}<div class="col-12 text-muted">표시할 게시글이 없습니다.</div>{{/postCards}}
+        </div>
+    </section>
+
+    <!-- 분야별 변호사(없어도 조용히 건너뜀) -->
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="lgc-sec-title mb-0">분야별 변호사 &gt;</h5>
+        </div>
+
+        <ul class="nav nav-pills gap-2 flex-wrap mb-3" id="lawyerTab">
+            {{#lawyerCategories}}
+                <li class="nav-item">
+                    <a class="nav-link {{#active}}active{{/active}}" data-category="{{key}}" href="javascript:void(0)">{{label}}</a>
+                </li>
+            {{/lawyerCategories}}
+        </ul>
+
+        <div class="row g-3" id="lawyerGrid">
+            {{#lawyers}}
+                <div class="col-md-6" data-category="{{categoryKey}}">
+                    <div class="card lgc-lawyer-card h-100">
+                        <div class="card-body d-flex gap-3">
+                            <img src="{{avatarUrl}}" class="rounded-circle flex-shrink-0" alt="변호사" width="56" height="56">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <div class="fw-semibold">{{name}} 변호사</div>
+                                        {{#office}}<div class="text-muted small">{{office}}</div>{{/office}}
+                                    </div>
+                                    {{#experience}}<span class="badge bg-light text-dark">{{experience}}</span>{{/experience}}
+                                </div>
+                                {{#intro}}<p class="text-muted small mb-2 mt-2 lgc-ellipsis-2">{{intro}}</p>{{/intro}}
+                                <div class="d-flex flex-wrap gap-1">
+                                    {{#chips}}<span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis">{{.}}</span>{{/chips}}
+                                </div>
+                                <div class="mt-3"><a href="/view/lawyers/{{id}}" class="btn btn-outline-primary btn-sm">프로필 보기</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{/lawyers}}
+            {{^lawyers}}<div class="col-12 text-muted">표시할 변호사 카드가 없습니다。</div>{{/lawyers}}
+        </div>
+    </section>
+</div>
+
+{{> layout/footer}}
+
+<style>
+    .lgc-hero{background:#eef1f7; padding:64px 0 56px; border-bottom:1px solid #e7ebf3;}
+    .lgc-sec-title{font-weight:700;}
+    .lgc-post-card{border:1px solid #e8ebf2; border-radius:12px; padding:16px 18px; background:#fff; margin-bottom:14px;}
+    .lgc-post-head .badge{font-weight:600;}
+    .lgc-post-meta{color:#7b8496;}
+    .lgc-ellipsis-2{display:-webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp:2; overflow:hidden;}
+    .lgc-lawyer-card{border:1px solid #e8ebf2; border-radius:16px;}
+    .nav-pills .nav-link{border-radius:999px; padding:.35rem .9rem; font-weight:600; background:#f2f4fb; color:#3c4152;}
+    .nav-pills .nav-link.active{background:#2F57F6; color:#fff;}
+</style>
+
+<script>
+    (function(){
+      function setupFilter(tabId, gridId){
+        const tab = document.getElementById(tabId);
+        const grid = document.getElementById(gridId);
+        if(!tab || !grid) return;
+        tab.addEventListener('click', (e) => {
+          const a = e.target.closest('a[data-category]');
+          if(!a) return;
+          const key = a.getAttribute('data-category');
+          tab.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+          a.classList.add('active');
+          grid.querySelectorAll('[data-category]').forEach(card => {
+            card.style.display = (key === 'all' || card.getAttribute('data-category') === key) ? '' : 'none';
+          });
+        });
+      }
+      setupFilter('postTab', 'postGrid');     // 분야별 게시글
+      setupFilter('lawyerTab', 'lawyerGrid'); // 분야별 변호사
+    })();
+</script>

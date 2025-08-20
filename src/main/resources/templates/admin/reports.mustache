@@ -1,0 +1,43 @@
+{{> layout/header}}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3">신고 내역</h2>
+
+    <div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>대상</th>
+            <th>사유</th>
+            <th>신고자</th>
+            <th>일시</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#reportList}}
+            <tr>
+                <td>
+                    {{#post}}게시글: <a href="/view/posts/{{id}}" class="text-decoration-none">{{title}}</a>{{/post}}
+                    {{#comment}}<div>댓글: {{content}}</div>{{/comment}}
+                </td>
+                <td>{{reason}}</td>
+                <td>{{reporter.email}}</td>
+                <td>{{createdDate}}</td>
+                <td class="text-nowrap">
+                    <form action="/admin/reports/{{id}}/delete" method="post" style="display:inline;">
+                        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+                        <button class="btn btn-sm btn-danger" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+                    </form>
+                </td>
+            </tr>
+        {{/reportList}}
+        {{^reportList}}
+            <tr><td colspan="5" class="text-center text-muted">신고 내역이 없습니다.</td></tr>
+        {{/reportList}}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+{{> layout/footer}}

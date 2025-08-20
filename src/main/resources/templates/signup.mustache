@@ -1,0 +1,69 @@
+{{> layout/header}}
+
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="fw-bold mb-4 text-center">회원가입</h2>
+
+    {{#error}}
+        <div class="alert alert-danger">{{error}}</div>
+    {{/error}}
+
+    <form method="post" action="/view/signup">
+        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+        <div class="mb-3">
+            <label>이메일</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>비밀번호</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>이름</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>주소</label>
+            <input type="text" name="address" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>생년월일</label>
+            <input type="date" name="birthday" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>회원 유형</label>
+            <select name="role" id="role" class="form-control" onchange="toggleLawyerField()" required>
+                <option value="MEMBER">일반 회원</option>
+                <option value="LAWYER">변호사</option>
+            </select>
+        </div>
+
+        <!-- 🔽 변호사 선택 시만 보이는 자격증 번호 입력창 -->
+        <div class="mb-3" id="certificateDiv" style="display: none;">
+            <label>자격증 번호</label>
+            <input type="text" name="certificateNumber" class="form-control">
+        </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-primary w-100">회원가입</button>
+        </div>
+    </form>
+</div>
+
+<!-- 🔽 JavaScript로 선택에 따라 보여주기 -->
+<script>
+    function toggleLawyerField() {
+        const role = document.getElementById('role').value;
+        const certDiv = document.getElementById('certificateDiv');
+        certDiv.style.display = (role === 'LAWYER') ? 'block' : 'none';
+    }
+
+    // 페이지 새로고침 시에도 적용
+    window.addEventListener("DOMContentLoaded", toggleLawyerField);
+</script>
+
+{{> layout/footer}}

@@ -1,0 +1,18 @@
+{{> layout/header}}
+
+<div class="container mt-5 mb-5" style="max-width:640px;">
+    <h2 class="fw-bold mb-4 text-center text-danger">회원 탈퇴</h2>
+    <div class="card p-4 shadow-sm">
+        <p class="mb-4 text-center">
+            탈퇴하시면 모든 정보가 삭제되며 복구할 수 없습니다.<br>
+            <strong>이 작업은 되돌릴 수 없습니다.</strong>
+        </p>
+        <form method="post" action="/view/mypage/withdraw" class="d-grid gap-2">
+            <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+            <button type="submit" class="btn btn-danger">회원 탈퇴</button>
+            <a href="/view/mypage" class="btn btn-secondary">취소</a>
+        </form>
+    </div>
+</div>
+
+{{> layout/footer}}

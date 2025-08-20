@@ -1,0 +1,23 @@
+{{> layout/header}}
+
+<div class="container mt-4">
+    <h2 class="mb-3">게시글 목록</h2>
+
+    {{#posts}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="/view/posts/{{id}}">{{title}}</a>
+                </h5>
+                <p class="card-text text-truncate">{{content}}</p>
+                <div class="small text-muted">
+                    카테고리: {{category.name}} · 조회수: {{views}} · 작성일: {{generationDate}}
+                </div>
+            </div>
+        </div>
+    {{/posts}}
+
+    {{^posts}}
+        <p class="text-muted">표시할 게시글이 없습니다.</p>
+    {{/posts}}
+</div>

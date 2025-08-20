@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>LawGic</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="_csrf" content="{{_csrf.token}}">
+    <meta name="_csrf_header" content="{{_csrf.headerName}}">
+    <style>
+        .navbar {
+            background-color: #2323dd;
+            padding: 12px 24px;
+            position: fixed; /* 상단 고정 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000; /* 다른 요소 위에 표시 */
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f9fafb;
+            padding-top: 70px; /* 네비게이션 바 높이만큼 아래로 밀기 */
+        }
+
+        .lgc-sec-title-link {
+            color: inherit; /* 부모 글자색 상속 */
+            text-decoration: none; /* 밑줄 제거 */
+        }
+
+        .lgc-sec-title-link:hover {
+            color: inherit; /* hover 시 색상 유지 */
+            text-decoration: none;
+        }
+
+        .navbar-brand {
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand:hover {
+            color: white;
+        }
+
+        .nav-link, .navbar-text {
+            color: white !important;
+        }
+
+        .search-form input {
+            width: 240px;
+        }
+
+        .hero {
+            background-color: #f1f5f9;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .footer {
+            background-color: #333;
+            color: #fff;
+            padding: 30px 0;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .dashboard-links {
+            padding: 40px 20px;
+        }
+
+        .dashboard-links h5 {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-links a {
+            display: block;
+            margin-bottom: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 네비게이션 바 -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <!-- 로고 + 검색 -->
+        <div class="d-flex align-items-center">
+            <a class="navbar-brand" href="/view">LAWGIC</a>
+            <form class="d-flex search-form ms-3" method="get" action="/view/posts/search">
+                <input class="form-control form-control-sm me-2" type="search" name="keyword" placeholder="게시글 검색">
+                <button class="btn btn-light btn-sm" type="submit">검색</button>
+            </form>
+        </div>
+
+        <!-- 로그인 상태 -->
+        <ul class="navbar-nav flex-row align-items-center gap-3">
+            {{#userEmail}}
+                <li class="nav-item"><a class="nav-link disabled">환영합니다, {{username}}님</a></li>
+
+                <li class="nav-item"><a class="nav-link" href="/view/posts/new">글쓰기</a></li>
+
+                {{#isAdmin}}
+                    <li class="nav-item"><a class="nav-link" href="/admin">관리자 페이지</a></li>
+                {{/isAdmin}}
+                {{^isAdmin}}
+                    <li class="nav-item"><a class="nav-link" href="/view/mypage">마이페이지</a></li>
+                {{/isAdmin}}
+
+                <li class="nav-item">
+                    <form action="/logout" method="post" class="d-inline">
+                        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+                        <button type="submit" class="btn btn-sm btn-outline-light ms-2">로그아웃</button>
+                    </form>
+                </li>
+
+                <!-- 🔔 로그인한 사용자에게만 알림 벨 노출 -->
+                <li class="nav-item dropdown" data-bs-auto-close="outside">
+                    <button
+                            class="nav-link dropdown-toggle position-relative btn btn-link p-0"
+                            id="notifDropdown"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        <i class="fa-solid fa-bell text-light fs-5"></i>
+                        <span id="notifCount"
+                              class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle"
+                              style="display:none;">0</span>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="notifDropdown"
+                        style="min-width:320px;">
+                        <li class="px-3 py-2 d-flex justify-content-between align-items-center">
+                            <strong>알림</strong>
+                            <button id="markAllReadBtn" class="btn btn-sm btn-link">모두 읽음</button>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <div id="notifList" style="max-height:360px; overflow:auto;">
+                                <div class="text-center text-muted py-3">알림을 불러오는 중…</div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <!-- /알림 벨 -->
+            {{/userEmail}}
+
+            {{^userEmail}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/view/login">로그인</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/view/signup?user=member">회원가입</a>
+                </li>
+            {{/userEmail}}
+        </ul>
+    </div>
+</nav>
+{{#userEmail}}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const $ddToggle = document.getElementById('notifDropdown');
+          const $count    = document.getElementById('notifCount');
+          const $list     = document.getElementById('notifList');
+          const $markAll  = document.getElementById('markAllReadBtn');
+          if (!$ddToggle || !$count || !$list) return;
+
+          // 드롭다운 인스턴스 보장
+          bootstrap.Dropdown.getOrCreateInstance($ddToggle);
+
+          // ---- helpers ----
+          function csrfHeaders() {
+            const token  = document.querySelector('meta[name="_csrf"]')?.content;
+            const header = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+            return token ? { [header]: token } : {};
+          }
+          const isJson = (res) => (res.headers.get('content-type') || '').includes('application/json');
+
+          // /view/post/123 또는 /view/posts/123 를 /view/posts/123 로 표준화하되, 기존 쿼리/해시는 유지
+          function normalizeUrl(url) {
+            try {
+              const u = new URL(url, window.location.origin);
+              const m = u.pathname.match(/\/view\/post[s]?\/(\d+)/);
+              if (m) u.pathname = `/view/posts/${m[1]}`;
+              return u.pathname + u.search + u.hash;
+            } catch {
+              const m = (url || '').match(/^(.*?)(\?[^#]*)?(#.*)?$/);
+              const path = (m?.[1] ?? '');
+              const q    = (m?.[2] ?? '');
+              const h    = (m?.[3] ?? '');
+              const idm  = path.match(/\/view\/post[s]?\/(\d+)/);
+              const newPath = idm ? `/view/posts/${idm[1]}` : path || '#';
+              return newPath + q + h;
+            }
+          }
+
+          // url 에 안전하게 쿼리 추가
+          function addQueryParam(url, key, value) {
+            try {
+              const u = new URL(url, window.location.origin);
+              u.searchParams.set(key, value);
+              return u.pathname + u.search + u.hash;
+            } catch {
+              const hasQ = url.includes('?');
+              const sep  = hasQ ? '&' : '?';
+              return `${url}${sep}${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+            }
+          }
+
+            function getCookie(name) {
+    return document.cookie
+      .split('; ')
+      .map(v => v.split('='))
+      .reduce((acc,[k,...rest]) => (acc[k] = rest.join('='), acc), {})[name];
+  }
+
+  function csrfHeaders() {
+    // 1) <meta> 우선
+    const metaToken  = document.querySelector('meta[name="_csrf"]')?.content;
+    const metaHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    if (metaToken && metaHeader) return { [metaHeader]: metaToken };
+
+    // 2) Cookie(XSRF-TOKEN) 폴백 (Spring Security CookieCsrfTokenRepository 사용 시)
+    const xsrf = getCookie('XSRF-TOKEN');
+    if (xsrf) return { 'X-XSRF-TOKEN': decodeURIComponent(xsrf) };
+
+    // 3) 히든 필드 폴백 (페이지 어딘가에 _csrf input이 있을 때)
+    const hidden = document.querySelector('input[name="_csrf"]');
+    if (hidden?.value) return { 'X-CSRF-TOKEN': hidden.value };
+
+    // 실패 시 빈 헤더 반환하지 말고 콘솔 경고
+    console.warn('CSRF 토큰을 찾지 못했습니다. PATCH/POST가 403 날 수 있습니다.');
+    return {};
+  }
+
+          function setBadge(n) {
+            const v = Math.max(0, Number(n || 0));
+            if (v > 0) { $count.textContent = v; $count.style.display = 'inline-block'; }
+            else { $count.textContent = 0; $count.style.display = 'none'; }
+          }
+          function decBadge() {
+            setBadge((Number($count.textContent) || 0) - 1);
+          }
+          function markUIRead(aEl) {
+            aEl.classList.remove('fw-bold');
+            const dot = aEl.querySelector('div.me-2');
+            if (dot) dot.style.background = 'transparent';
+          }
+          function ensureEmptyMessage() {
+            const anyItem = $list.querySelector('a.dropdown-item');
+            const anyBold = $list.querySelector('a.dropdown-item.fw-bold');
+            if (!anyItem) {
+              $list.innerHTML = '<div class="text-center text-muted py-3">새 알림이 없습니다.</div>';
+            } else if (!anyBold && (Number($count.textContent) || 0) === 0) {
+              // 모두 읽음 상태: 목록은 남겨두되 배지만 0
+            }
+          }
+
+          // ---- API ----
+          async function fetchUnreadCount() {
+            try {
+            const res = await fetch(`/api/notifications/unread-count?ts=${Date.now()}`, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { 'Accept': 'application/json' }
+            });
+            if (!res.ok) return; // 서버 값만 신뢰
+            const { count } = await res.json();
+            setBadge(count ?? 0);
+            } catch (_) {}
+          }
+
+
+async function fetchList() {
+  try {
+    const res = await fetch(`/api/notifications?limit=10&ts=${Date.now()}`, {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) {
+      $list.innerHTML = '<div class="text-center text-muted py-3">목록을 불러오지 못했습니다.</div>';
+      return;
+    }
+    const text  = await res.text();
+    const items = (text && text.trim().startsWith('[')) ? JSON.parse(text) : [];
+
+              if (!items.length) {
+                $list.innerHTML = '<div class="text-center text-muted py-3">새 알림이 없습니다.</div>';
+                return;
+              }
+
+              $list.innerHTML = items.map(i => {
+                // 표준화 → nid 쿼리 추가
+                const hrefBase = normalizeUrl(i.linkUrl);
+                const href     = addQueryParam(hrefBase, 'nid', i.id);
+
+                const d = new Date(i.createdAt);
+                const when = isNaN(d) ? (i.createdAt ?? '') : d.toLocaleString();
+
+                return `
+                  <a class="dropdown-item d-flex ${i.read ? '' : 'fw-bold'}" href="${href}" data-id="${i.id}">
+                    <div class="me-2" style="width:6px; border-radius:3px; background:${i.read ? 'transparent' : '#dc3545'}"></div>
+                    <div>
+                      <div>${i.message ?? ''}</div>
+                      <div class="small text-muted">${when}</div>
+                    </div>
+                  </a>
+                `;
+              }).join('');
+            } catch (e) {
+    $list.innerHTML = '<div class="text-center text-muted py-3">목록을 불러오지 못했습니다.</div>';
+  }
+          }
+
+          // 드롭다운 열릴 때 목록 갱신
+          $ddToggle.addEventListener('show.bs.dropdown', fetchList);
+
+          // 항목 클릭 → (1)UI 즉시 읽음 (2)서버 PATCH(keepalive) (3)닫고 이동
+          $list.addEventListener('click', async (ev) => {
+            const a = ev.target.closest('a.dropdown-item');
+            if (!a) return;
+            ev.preventDefault();
+
+            const id   = a.getAttribute('data-id');
+            const href = a.getAttribute('href'); // 이미 normalize + ?nid= 적용됨
+
+            // (1) UI 먼저 반영
+            if (a.classList.contains('fw-bold')) {
+              markUIRead(a);
+              decBadge();
+            }
+
+            // (2) 서버 읽음 처리
+            try {
+              await fetch(`/api/notifications/${id}/read`, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', ...csrfHeaders() },
+                keepalive: true
+              });
+            } catch (_) {}
+
+            // (3) 닫고 이동
+            try { bootstrap.Dropdown.getOrCreateInstance($ddToggle).hide(); } catch (_) {}
+            ensureEmptyMessage();
+
+            if (href && href !== '#') window.location.assign(href);
+          });
+
+          // 모두 읽음
+          $markAll?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  try {
+    const res = await fetch('/api/notifications/read-all', {
+      method: 'PATCH',
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'Content-Type': 'application/json', ...csrfHeaders(), 'Accept': 'application/json' },
+      keepalive: true
+    });
+
+    if (!res.ok) {
+      console.error('모두 읽음 처리 실패', res.status, await res.text());
+      // 서버 반영 실패 → 즉시 서버 값 재동기화(배지 복구)
+      await fetchUnreadCount();
+      return;
+    }
+
+    // 성공 시 UI 일괄 갱신
+    $list.querySelectorAll('a.dropdown-item.fw-bold').forEach(markUIRead);
+    setBadge(0);
+    ensureEmptyMessage();
+
+  } catch (err) {
+    console.error('모두 읽음 처리 실패', err);
+    await fetchUnreadCount();
+  }
+});
+
+
+          // 최초 배지 동기화 + 주기 갱신
+          fetchUnreadCount();
+          setInterval(fetchUnreadCount, 30000);
+        });
+    </script>
+{{/userEmail}}

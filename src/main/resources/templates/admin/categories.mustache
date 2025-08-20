@@ -1,0 +1,35 @@
+{{> layout/header}}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3">카테고리 관리</h2>
+
+    <div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>카테고리명</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#categoryList}}
+            <tr>
+                <td>{{name}}</td>
+                <td class="text-nowrap">
+                    <a href="/admin/categories/{{id}}/edit" class="btn btn-sm btn-primary">수정</a>
+                    <form action="/admin/categories/{{id}}/delete" method="post" style="display:inline;">
+                        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+                        <button class="btn btn-sm btn-danger" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+                    </form>
+                </td>
+            </tr>
+        {{/categoryList}}
+        {{^categoryList}}
+            <tr><td colspan="2" class="text-center text-muted">카테고리가 없습니다.</td></tr>
+        {{/categoryList}}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+{{> layout/footer}}

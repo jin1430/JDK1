@@ -1,0 +1,56 @@
+{{> layout/header}}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3">댓글 관리</h2>
+
+    <div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light">
+        <tr>
+            <th>댓글</th>
+            <th>작성자</th>
+            <th>게시글</th>
+            <th>작성일</th>
+            <th>관리</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#commentList}}
+            <tr>
+                <td>{{content}}</td>
+                <td>{{lawyer.user.email}}</td>
+                <td><a href="/view/posts/{{post.id}}" class="text-decoration-none">{{post.title}}</a></td>
+                <td>{{generationDate}}</td>
+                <td class="text-nowrap">
+                    <form action="/admin/comments/{{id}}/delete" method="post" style="display:inline;">
+                        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+                        <button class="btn btn-sm btn-danger" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+                    </form>
+                </td>
+            </tr>
+        {{/commentList}}
+
+        {{#comments}}  {{! 호환 루프 }}
+            <tr>
+                <td>{{content}}</td>
+                <td>{{lawyer.user.email}}</td>
+                <td><a href="/view/posts/{{post.id}}" class="text-decoration-none">{{post.title}}</a></td>
+                <td>{{generationDate}}</td>
+                <td class="text-nowrap">
+                    <form action="/admin/comments/{{id}}/delete" method="post" style="display:inline;">
+                        <input type="hidden" name="{{_csrf.parameterName}}" value="{{_csrf.token}}">
+                        <button class="btn btn-sm btn-danger" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+                    </form>
+                </td>
+            </tr>
+        {{/comments}}
+
+        {{^commentList}}{{^comments}}
+            <tr><td colspan="5" class="text-center text-muted">댓글이 없습니다.</td></tr>
+        {{/comments}}{{/commentList}}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+{{> layout/footer}}

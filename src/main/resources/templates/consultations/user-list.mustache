@@ -1,0 +1,39 @@
+{{> layout/header}}
+<main class="container py-4">
+    <h3 class="mb-3">내 상담 내역</h3>
+
+    {{#consultations}}
+        <div class="card mb-3" id="c{{id}}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="fw-bold">{{title}}</div>
+                        <small class="text-muted">상대: {{lawyer.user.username}} 변호사 / {{requestDate}}</small>
+                    </div>
+                    <span class="badge {{#isCompleted}}bg-success{{/isCompleted}}{{^isCompleted}}bg-secondary{{/isCompleted}}">
+          {{#isCompleted}}완료{{/isCompleted}}{{^isCompleted}}대기{{/isCompleted}}
+        </span>
+                </div>
+
+                <p class="mt-2 mb-2">{{content}}</p>
+
+                {{#lawyerReply}}
+                    <div class="p-3 bg-light rounded">
+                        <div class="fw-semibold">변호사 답변</div>
+                        <div class="mt-1">{{lawyerReply}}</div>
+                        <small class="text-muted">답변일: {{replyDate}}</small>
+                    </div>
+                {{/lawyerReply}}
+
+                {{^lawyerReply}}
+                    <div class="alert alert-info mt-2 mb-0">아직 답변 대기 중입니다.</div>
+                {{/lawyerReply}}
+            </div>
+        </div>
+    {{/consultations}}
+
+    {{^consultations}}
+        <p class="text-muted">요청한 상담이 없습니다.</p>
+    {{/consultations}}
+</main>
+{{> layout/footer}}

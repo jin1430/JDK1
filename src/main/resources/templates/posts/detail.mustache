@@ -1,0 +1,101 @@
+{{> layout/header}}
+
+<div class="container mt-5 mb-5" style="max-width: 800px;">
+    <h2 class="fw-bold mb-3">{{post.title}}</h2>
+
+    <div class="mb-2 text-muted">
+        카테고리:
+        {{#post.category}}{{name}}{{/post.category}}
+        {{^post.category}}{{post.categoryName}}{{/post.category}}
+        |
+        작성일: {{post.generationDate}}
+    </div>
+
+    <hr>
+
+    {{#post.imageUrl}}
+        <figure class="mb-4">
+            <img src="{{post.imageUrl}}" alt="{{post.title}}" class="img-fluid rounded shadow-sm">
+        </figure>
+    {{/post.imageUrl}}
+
+    <div class="mb-4" style="min-height:120px;">
+        {{post.content}}
+    </div>
+
+    <div class="mb-4 d-flex gap-2">
+        <a href="/view/posts" class="btn btn-secondary">목록으로</a>
+
+        {{#isMyPost}}
+            <a href="/view/posts/{{post.id}}/edit" class="btn btn-outline-primary">수정</a>
+            <form method="post" action="/view/posts/{{post.id}}/delete" style="display:inline;">
+                {{#_csrf}}<input type="hidden" name="{{parameterName}}" value="{{token}}">{{/_csrf}}
+                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('이 글을 삭제할까요?')">삭제</button>
+            </form>
+        {{/isMyPost}}
+    </div>
+
+    <!-- 댓글 목록 -->
+    <section class="mb-5">
+        <div class="d-flex align-items-center justify-content-between">
+            <h4 class="mb-3">댓글 ({{commentsCount}})</h4>
+            <small class="text-muted">※ 댓글 기능은 <strong>변호사만</strong> 이용할 수 있습니다.</small>
+        </div>
+
+        {{#comments}}
+            <div id="c{{id}}" class="card mb-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex gap-2 align-items-center">
+                            {{#lawyerProfileImage}}
+                                <img src="{{lawyerProfileImage}}" alt="프로필" class="rounded-circle" style="width:36px;height:36px;object-fit:cover;">
+                            {{/lawyerProfileImage}}
+                            <div>
+                                <div class="fw-bold">
+                                    {{#lawyerName}}{{lawyerName}}{{/lawyerName}}
+                                    {{^lawyerName}}{{lawyer.user.username}}{{/lawyerName}}
+                                </div>
+                                <small class="text-muted">
+                                    {{#createdAt}}{{createdAt}}{{/createdAt}}
+                                    {{^createdAt}}{{generationDate}}{{/createdAt}}
+                                </small>
+                            </div>
+                        </div>
+
+                        {{#canManage}}
+                            <div class="ms-2">
+                                <a href="/view/posts/{{post.id}}/comments/{{id}}/edit" class="btn btn-sm btn-outline-secondary">수정</a>
+                                <form method="post" action="/view/posts/{{post.id}}/comments/{{id}}/delete" class="d-inline">
+                                    {{#_csrf}}<input type="hidden" name="{{parameterName}}" value="{{token}}">{{/_csrf}}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('이 댓글을 삭제할까요?')">삭제</button>
+                                </form>
+                            </div>
+                        {{/canManage}}
+                    </div>
+
+                    <p class="mb-0 mt-2">{{content}}</p>
+                </div>
+            </div>
+        {{/comments}}
+
+        {{^comments}}
+            <p class="text-muted">아직 댓글이 없습니다.</p>
+        {{/comments}}
+    </section>
+
+    <!-- 댓글 작성: 변호사만 -->
+    {{#canWriteComment}}
+        <section class="mb-5">
+            <h5>댓글 작성</h5>
+            <form method="post" action="/view/posts/{{post.id}}/comments" enctype="application/x-www-form-urlencoded">
+                {{#_csrf}}<input type="hidden" name="{{parameterName}}" value="{{token}}">{{/_csrf}}
+                <div class="mb-3">
+                    <textarea name="content" class="form-control" rows="3" placeholder="댓글을 입력하세요." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">댓글 등록</button>
+            </form>
+        </section>
+    {{/canWriteComment}}
+</div>
+
+{{> layout/footer}}

@@ -1,0 +1,25 @@
+{{> layout/header}}
+
+<div class="container mt-5 mb-5">
+    <h2 class="fw-bold mb-4 text-center">내가 쓴 글</h2>
+
+    {{#posts}}
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <a href="/view/posts/{{id}}" class="h5 card-title fw-bold text-dark text-decoration-none">
+                    {{title}}
+                </a>
+                <p class="card-text mt-2 text-muted">{{content}}</p>
+                <div class="text-muted small">
+                    <span>작성일: {{generationDate}}</span>
+                </div>
+            </div>
+        </div>
+    {{/posts}}
+
+    {{^posts}}
+        <p class="text-center text-muted">아직 작성한 게시글이 없습니다.</p>
+    {{/posts}}
+</div>
+
+{{> layout/footer}}

@@ -1,0 +1,23 @@
+{{> layout/header}}
+
+<div class="container mt-5 mb-5">
+    <h2 class="fw-bold mb-4 text-center">내가 쓴 댓글</h2>
+    {{#comments}}
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <div class="mb-2">
+                    <a href="/view/posts/{{post.id}}" class="h5 card-title fw-bold text-dark text-decoration-none">게시글: {{post.title}}</a>
+                </div>
+                <p class="card-text">{{content}}</p>
+                <div class="text-muted small">
+                    <span>작성일: {{generationDate}}</span>
+                </div>
+            </div>
+        </div>
+    {{/comments}}
+    {{^comments}}
+        <p class="text-center text-muted">아직 작성한 댓글이 없습니다.</p>
+    {{/comments}}
+</div>
+
+{{> layout/footer}}
